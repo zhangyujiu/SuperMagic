@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="eclipse-astparser-8.1">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/src/lib/eclipse-astparser-8.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
