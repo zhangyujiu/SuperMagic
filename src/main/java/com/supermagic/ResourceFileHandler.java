@@ -85,9 +85,11 @@ public class ResourceFileHandler {
                 if (match.equals("view")
                         || match.equals("progress")
                         || match.equals("background")
+                        || match.equals("content")
                 ) continue;
-                if (match.length() < 3) continue;
-                if (!idMaps.containsKey(match)) {
+                if (!idMaps.containsKey(match)
+                        && match.replace("_", "").length() >= 4
+                ) {
                     String newIdName = NameUtils.encodeViewId(match, packageName, map, null);
                     idMaps.put(match, newIdName);
                 }
@@ -115,10 +117,21 @@ public class ResourceFileHandler {
                     String newViewBindingId = convertId2ViewBindingId(newId);
                     // 替换R.id.xxx
                     targetContent = targetContent.replaceAll("R\\.id\\." + oldId + "\\)", "R.id." + newId + ")");
+                    targetContent = targetContent.replaceAll("R\\.id\\." + oldId + " ", "R.id." + newId + " ");
+                    targetContent = targetContent.replaceAll("R\\.id\\." + oldId + ",", "R.id." + newId + ",");
+                    targetContent = targetContent.replaceAll("R\\.id\\." + oldId + ":", "R.id." + newId + ":");
+
+                    //替换binding.xxx
+                    targetContent = targetContent.replaceAll("includeBinding\\." + oldViewBindingId + "\\.", "includeBinding." + newViewBindingId + ".");
+                    targetContent = targetContent.replaceAll("includeBinding\\." + oldViewBindingId + ",", "includeBinding." + newViewBindingId + ",");
+                    targetContent = targetContent.replaceAll("includeBinding\\?\\." + oldViewBindingId + "\\?\\.", "includeBinding?." + newViewBindingId + "?.");
+                    targetContent = targetContent.replaceAll("includeBinding\\." + oldViewBindingId + "\\)", "includeBinding." + newViewBindingId + ")");
 
                     targetContent = targetContent.replaceAll("binding\\." + oldViewBindingId + "\\.", "binding." + newViewBindingId + ".");
                     targetContent = targetContent.replaceAll("binding\\." + oldViewBindingId + ",", "binding." + newViewBindingId + ",");
                     targetContent = targetContent.replaceAll("binding\\." + oldViewBindingId + "\\)", "binding." + newViewBindingId + ")");
+                    targetContent = targetContent.replaceAll("binding\\." + oldViewBindingId + ";", "binding." + newViewBindingId + ";");
+//                    targetContent = targetContent.replaceAll("binding\\." + oldViewBindingId + "\n", "binding." + newViewBindingId + "\n");
 
                     System.out.println(oldViewBindingId + " > " + newViewBindingId);
                 }
