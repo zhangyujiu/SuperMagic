@@ -10,10 +10,11 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ResourceFileHandler {
 
@@ -62,6 +63,90 @@ public class ResourceFileHandler {
                 existKeys.add(key);
             }
         }
+    }
+
+    public Map<String, String> idMaps = new HashMap<>();
+
+    public void handleLayoutViewId() {
+        Map<String, String> map = new HashMap<>();
+        File root = new File(PATH);
+        List<File> stringFiles = new ArrayList<File>();
+        Utils.iterateForTargetFile(root, stringFiles, "glob:**/src/*/res/layout/*.{xml}");
+        for (File file : stringFiles) {
+            String content = Utils.readFileString(file);
+            if (content == null) continue;
+            // 定义正则表达式模式，匹配 android:id="@+id/ 后面接的任意字符的序列
+            Pattern pattern = Pattern.compile("android:id=\"@\\+id/([^\"]+)\"");
+            Matcher matcher = pattern.matcher(content);
+
+            // 查找匹配的子串并添加到 Set 中
+            while (matcher.find()) {
+                String match = matcher.group(1); // 取匹配的内容
+                if (match.equals("view")
+                        || match.equals("progress")
+                        || match.equals("background")
+                ) continue;
+                if (match.length() < 3) continue;
+                if (!idMaps.containsKey(match)) {
+                    String newIdName = NameUtils.encodeViewId(match, packageName, map, null);
+                    idMaps.put(match, newIdName);
+                }
+
+            }
+
+        }
+        for (File target : targetFiles) {
+            String targetContent;
+            if (MinifyController.FileContents.containsKey(target)) {
+                targetContent = MinifyController.FileContents.get(target);
+            } else {
+                targetContent = Utils.readFileString(target);
+            }
+            if (targetContent == null) continue;
+
+            for (Map.Entry<String, String> entry : idMaps.entrySet()) {
+                String oldId = entry.getKey();
+                String newId = entry.getValue();
+                if (target.getName().endsWith(".xml")) {
+                    targetContent = targetContent.replaceAll("id/" + oldId + "\"", "id/" + newId + "\"");
+                }
+                if (target.getName().endsWith(".java") || target.getName().endsWith(".kt")) {
+                    String oldViewBindingId = convertId2ViewBindingId(oldId);
+                    String newViewBindingId = convertId2ViewBindingId(newId);
+                    // 替换R.id.xxx
+                    targetContent = targetContent.replaceAll("R\\.id\\." + oldId + "\\)", "R.id." + newId + ")");
+
+                    targetContent = targetContent.replaceAll("binding\\." + oldViewBindingId + "\\.", "binding." + newViewBindingId + ".");
+                    targetContent = targetContent.replaceAll("binding\\." + oldViewBindingId + ",", "binding." + newViewBindingId + ",");
+                    targetContent = targetContent.replaceAll("binding\\." + oldViewBindingId + "\\)", "binding." + newViewBindingId + ")");
+
+                    System.out.println(oldViewBindingId + " > " + newViewBindingId);
+                }
+            }
+            MinifyController.FileContents.put(target, targetContent);
+        }
+    }
+
+    private String convertId2ViewBindingId(String id) {
+        String[] splits = id.split("_");
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < splits.length; i++) {
+            String s;
+            if (i > 0) {
+                s = capitalizeFirstLetter(splits[i]);
+            } else {
+                s = splits[i];
+            }
+            sb.append(s);
+        }
+        return sb.toString();
+    }
+
+    public static String capitalizeFirstLetter(String word) {
+        if (word == null || word.isEmpty()) {
+            return word;
+        }
+        return Character.toUpperCase(word.charAt(0)) + word.substring(1);
     }
 
     public void handleFileResource(String resource) {

@@ -44,6 +44,19 @@ public class NameUtils {
         } while (true);
     }
 
+    public static String encodeViewId(String name, String packageName, Map<String, String> dic, List<String> existKeys) {
+        if (dic.containsKey(name)) {
+            return dic.get(name);
+        }
+        do {
+            String encodedName = encodeResource(name, packageName, 4);
+            if (!dic.values().contains(encodedName) && (existKeys == null || !existKeys.contains(encodedName))) {
+                dic.put(name, encodedName);
+                return encodedName;
+            }
+        } while (true);
+    }
+
     private static String encodeResource(String name, String packageName, int step) {
         int hashCode = Math.abs((name + packageName).hashCode());
         int length = hashCode % DIC_RESOURCE.length();
