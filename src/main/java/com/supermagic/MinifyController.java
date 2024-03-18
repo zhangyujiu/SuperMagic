@@ -16,7 +16,7 @@ public class MinifyController {
     public static void minify(String packageName, String PATH, String[] args) throws Exception {
 
         ResourceFileHandler resourceFileHandler = new ResourceFileHandler(packageName, PATH);
-        /*System.out.println("修改dimen文件");
+        System.out.println("修改dimen文件");
         resourceFileHandler.handleResourceKey("dimen");
         System.out.println("修改styles文件");
         resourceFileHandler.handleResourceKey("style");
@@ -33,7 +33,8 @@ public class MinifyController {
         resourceFileHandler.handleFileResource("drawable");
         resourceFileHandler.handleFileResource("mipmap");
         System.out.println("修改anim文件");
-        resourceFileHandler.handleFileResource("anim");*/
+        resourceFileHandler.handleFileResource("anim");
+        System.out.println("修改view的id名");
         resourceFileHandler.handleLayoutViewId();
 
 //        ClassMinify classMinify = new ClassMinify(packageName, PATH, args);

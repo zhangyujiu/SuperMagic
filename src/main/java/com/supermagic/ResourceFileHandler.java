@@ -37,11 +37,12 @@ public class ResourceFileHandler {
         Map<String, String> map = new HashMap<>();
         List<File> stringFiles = new ArrayList<File>();
         //Utils.iterateForTargetFile(root, stringFiles, "glob:**/values/*.xml");
-        Utils.iterateForTargetFile(root, stringFiles, "glob:**/src/main/res/values*/*.xml");
-        Utils.iterateForTargetFile(root, stringFiles, "glob:**/src/gotubi/res/values*/*.xml");
-        Utils.iterateForTargetFile(root, stringFiles, "glob:**/src/luckypanda/res/values*/*.xml");
-        Utils.iterateForTargetFile(root, stringFiles, "glob:**/src/tikplay/res/values*/*.xml");
-        Utils.iterateForTargetFile(root, stringFiles, "glob:**/src/cashbird/res/values*/*.xml");
+//        Utils.iterateForTargetFile(root, stringFiles, "glob:**/src/main/res/values*/*.xml");
+//        Utils.iterateForTargetFile(root, stringFiles, "glob:**/src/gotubi/res/values*/*.xml");
+//        Utils.iterateForTargetFile(root, stringFiles, "glob:**/src/luckypanda/res/values*/*.xml");
+//        Utils.iterateForTargetFile(root, stringFiles, "glob:**/src/tikplay/res/values*/*.xml");
+//        Utils.iterateForTargetFile(root, stringFiles, "glob:**/src/cashbird/res/values*/*.xml");
+        Utils.iterateForTargetFile(root, stringFiles, "glob:**/src/*/res/values*/*.xml");
         //Utils.iterateForTargetFile(root, stringFiles, "glob:**/src/main/res/values-*/*.xml");
         List<String> existKeys = new ArrayList<>();
         retrieveKeys(key, stringFiles, existKeys);
