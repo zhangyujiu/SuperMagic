@@ -251,8 +251,8 @@ public class ResourceFileHandler {
 //        Utils.iterateForTargetFile(root, stringFiles, "glob:**/src/tikplay/res/" + resource + "*/*.{xml,png,jpg,webp}");
 //        Utils.iterateForTargetFile(root, stringFiles, "glob:**/src/cashbird/res/" + resource + "*/*.{xml,png,jpg,webp}");
 //        Utils.iterateForTargetFile(root, stringFiles, "glob:**/src/tikshorts/res/" + resource + "*/*.{xml,png,jpg,webp}");
-        Utils.iterateForTargetFile(root, stringFiles, "glob:**/src/*/res/" + resource + "*/*.{xml,png,jpg,webp}");
-        Utils.iterateForTargetFile(root, stringFiles, "glob:**/src/*/res/" + resource + "-*/*.{xml,png,jpg,webp}");
+        Utils.iterateForTargetFile(root, stringFiles, "glob:**/src/*/res/" + resource + "*/*.{xml,png,jpg,webp,mp3}");
+        Utils.iterateForTargetFile(root, stringFiles, "glob:**/src/*/res/" + resource + "-*/*.{xml,png,jpg,webp,mp3}");
 
 
         for (File file : stringFiles) {

@@ -34,6 +34,8 @@ public class MinifyController {
         resourceFileHandler.handleFileResource("mipmap");
         System.out.println("修改anim文件");
         resourceFileHandler.handleFileResource("anim");
+        System.out.println("修改raw文件");
+        resourceFileHandler.handleFileResource("raw");
         System.out.println("修改view的id名");
         resourceFileHandler.handleLayoutViewId();
         System.out.println("修改代码路径，只针对Activity和ViewModel");
