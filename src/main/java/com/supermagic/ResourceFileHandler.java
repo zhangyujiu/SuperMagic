@@ -22,7 +22,10 @@ public class ResourceFileHandler {
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     private String packageName;
     private String PATH;
-
+    //<原始名字，随机名字>
+    Map<String, String> nameMaps = new HashMap<>();
+    //<文件名，<原始文件夹名字，随机文件夹名字>>
+    Map<String, Map<String, String>> resourceMaps = new HashMap<>();
 
     public ResourceFileHandler(String packageName, String path) {
         this.packageName = packageName;
@@ -138,6 +141,81 @@ public class ResourceFileHandler {
                 }
             }
             MinifyController.FileContents.put(target, targetContent);
+        }
+    }
+
+    public void handleResourcePath() {
+        Map<String, String> map = new HashMap<>();
+        File srcFiles = new File(new File(PATH).getAbsolutePath() + "/app/src/");
+        System.out.println(srcFiles.getAbsolutePath());
+        getAllFilePath(srcFiles, map);
+
+
+        for (File target : targetFiles) {
+            String targetContent;
+            if (MinifyController.FileContents.containsKey(target)) {
+                targetContent = MinifyController.FileContents.get(target);
+            } else {
+                targetContent = Utils.readFileString(target);
+            }
+            if (targetContent == null) continue;
+            if (target.getName().endsWith(".java")
+                    || target.getName().endsWith(".kt")
+                    || target.getName().endsWith(".xml")) {
+                for (Map.Entry<String, Map<String, String>> entry : resourceMaps.entrySet()) {
+                    for (Map.Entry<String, String> pathEntry : entry.getValue().entrySet()) {
+                        System.out.println(entry.getKey() + "---->" + pathEntry.getKey() + "--" + pathEntry.getValue());
+                        targetContent = targetContent.replaceAll(pathEntry.getKey(), pathEntry.getValue());
+                    }
+                }
+            }
+            MinifyController.FileContents.put(target, targetContent);
+        }
+
+    }
+
+    private void getAllFilePath(File srcFiles, Map<String, String> map) {
+        File[] files = srcFiles.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isFile()) {
+                    String name = file.getName();
+                    String absolutePath = file.getAbsolutePath();
+                    if (name.endsWith(".java") || name.endsWith(".kt")) {
+                        String content = Utils.readFileString(file);
+                        if (content != null
+                                && (content.contains(": BaseActivity")
+                                || content.contains(": AutoSizeActivity()")
+                                || content.contains("ViewModel()"))) {
+                            String dotPath = absolutePath.replace(File.separator, ".").replace(".kt", "").replace(".java", "");
+                            int index = dotPath.indexOf(packageName);
+                            if (index < 0) continue;
+                            String path = dotPath.substring(index).replace(packageName, "");
+                            String[] splits = path.split("\\.");
+                            StringBuilder oldObjectPath = new StringBuilder(packageName);
+                            StringBuilder newObjectPath = new StringBuilder(packageName);
+                            for (int i = 0; i < splits.length - 1; i++) {
+                                String split = splits[i];
+                                if (split.isEmpty()) continue;
+                                if (!nameMaps.containsKey(split)) {
+                                    String newFileName = NameUtils.encodeResource(split, packageName, map, null);
+                                    nameMaps.put(split, newFileName);
+                                }
+                                String s = nameMaps.get(split);
+                                oldObjectPath.append(".").append(split);
+                                newObjectPath.append(".").append(s);
+                            }
+                            resourceMaps.put(name, new HashMap<>() {
+                                {
+                                    put(oldObjectPath.toString(), newObjectPath.toString());
+                                }
+                            });
+                        }
+                    }
+                } else if (file.isDirectory()) {
+                    getAllFilePath(file, map);
+                }
+            }
         }
     }
 

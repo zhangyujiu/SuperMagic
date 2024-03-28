@@ -36,6 +36,8 @@ public class MinifyController {
         resourceFileHandler.handleFileResource("anim");
         System.out.println("修改view的id名");
         resourceFileHandler.handleLayoutViewId();
+        System.out.println("修改代码路径，只针对Activity和ViewModel");
+        resourceFileHandler.handleResourcePath();
 
 //        ClassMinify classMinify = new ClassMinify(packageName, PATH, args);
 //        classMinify.handle();
