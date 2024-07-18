@@ -78,6 +78,9 @@ public class ResourceFileHandler {
         Utils.iterateForTargetFile(root, stringFiles, "glob:**/src/*/res/layout/*.{xml}");
         for (File file : stringFiles) {
             String content = Utils.readFileString(file);
+            if (file.getName().contains("layout_selector_")
+                    || file.getName().contains("selector_custom_")
+            ) continue;
             if (content == null) continue;
             // 定义正则表达式模式，匹配 android:id="@+id/ 后面接的任意字符的序列
             Pattern pattern = Pattern.compile("android:id=\"@\\+id/([^\"]+)\"");
@@ -90,6 +93,8 @@ public class ResourceFileHandler {
                         || match.equals("progress")
                         || match.equals("background")
                         || match.equals("content")
+                        || match.equals("title_bar")
+                        || match.equals("bottom_nar_bar")
                 ) continue;
                 if (!idMaps.containsKey(match)
                         && match.replace("_", "").length() >= 4
